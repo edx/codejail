@@ -39,6 +39,23 @@ pipeline {
                 }
             }
         }
+        stage('Release to PyPI') {
+            when {
+                allOf {
+                    branch 'master'
+                    buildingTag()
+                }
+            }
+            steps {
+           		withPythonEnv('PYTHON_3.5') {
+                    sh '''
+                    pip install wheel twine
+                    python setup.py bdist_wheel
+                    twine upload dist/* --config-file ./.pypirc
+                    '''
+                }
+			}
+        }
      }
 
     post {
